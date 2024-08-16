@@ -4,6 +4,7 @@ namespace Rei\Phod;
 
 use Rei\Phod\Schema\IntSchema;
 use Rei\Phod\Schema\BoolSchema;
+use Rei\Phod\Schema\ArraySchema;
 use Rei\Phod\Schema\FloatSchema;
 use Rei\Phod\Schema\StringSchema;
 
@@ -27,5 +28,10 @@ class Phod
     public function bool(): BoolSchema
     {
         return new BoolSchema();
+    }
+
+    public function array(): ArraySchema
+    {
+        return new ArraySchema();
     }
 }
