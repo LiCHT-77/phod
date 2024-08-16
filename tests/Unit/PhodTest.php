@@ -3,6 +3,7 @@
 use Rei\Phod\Phod;
 use Rei\Phod\PhodSchema;
 use Rei\Phod\Schema\IntSchema;
+use Rei\Phod\Schema\BoolSchema;
 use Rei\Phod\Schema\FloatSchema;
 use Rei\Phod\Schema\StringSchema;
 
@@ -33,5 +34,15 @@ describe('float method', function () {
         expect($schema)
             ->toBeInstanceOf(PhodSchema::class)
             ->toBeInstanceOf(FloatSchema::class);
+    });
+});
+
+describe('bool method', function () {
+    it('should return a bool schema', function () {
+        $phod = new Phod();
+        $schema = $phod->bool();
+        expect($schema)
+            ->toBeInstanceOf(PhodSchema::class)
+            ->toBeInstanceOf(BoolSchema::class);
     });
 });
