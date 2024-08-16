@@ -3,6 +3,7 @@
 namespace Rei\Phod;
 
 use Rei\Phod\Schema\IntSchema;
+use Rei\Phod\Schema\FloatSchema;
 use Rei\Phod\Schema\StringSchema;
 
 class Phod
@@ -15,5 +16,10 @@ class Phod
     public function int(): IntSchema
     {
         return new IntSchema();
+    }
+
+    public function float(): FloatSchema
+    {
+        return new FloatSchema();
     }
 }
