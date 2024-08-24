@@ -3,6 +3,9 @@
 namespace Rei\Phod;
 
 
+/**
+ * @template T
+ */
 class PhodSchema
 {
     public function __construct(
@@ -12,6 +15,12 @@ class PhodSchema
         //
     }
 
+    /**
+     * refine the schema
+     *
+     * @param callable $callable
+     * @return PhodSchema
+     */
     public function refine(callable $callable): PhodSchema
     {
         return new static([
@@ -20,6 +29,12 @@ class PhodSchema
         ]);
     }
 
+    /**
+     * parse the value
+     *
+     * @param mixed $value
+     * @return T
+     */
     public function parse(mixed $value): mixed
     {
         $failed = fn (string $message) => throw new PhodParseFailedException($message);
@@ -31,6 +46,12 @@ class PhodSchema
         return $value;
     }
 
+    /**
+     * parse the value without throwing exception
+     *
+     * @param mixed $value
+     * @return ParseResult<T>
+     */
     public function safeParse(mixed $value): ParseResult
     {
         $failed = fn ($message) => new ParseResult(false, $value, $message);
