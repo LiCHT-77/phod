@@ -16,6 +16,16 @@ class PhodSchema
     }
 
     /**
+     * get the validators
+     *
+     * @return array<int, callable>
+     */
+    public function validators(): array
+    {
+        return $this->validators;
+    }
+
+    /**
      * refine the schema
      *
      * @param callable $callable
@@ -30,6 +40,27 @@ class PhodSchema
     }
 
     /**
+     * get the failed function for parse
+     *
+     * @return \Closure
+     */
+    private function getFailedForParse(): \Closure
+    {
+        return fn (string $message) => throw new PhodParseFailedException($message);
+    }
+
+    /**
+     * get the failed function for safe parse
+     *
+     *
+     * @return \Closure
+     */
+    private function getFailedForSafeParse(mixed $value): \Closure
+    {
+        return fn ($message) => new ParseResult(false, $value, $message);
+    }
+
+    /**
      * parse the value
      *
      * @param mixed $value
@@ -37,7 +68,7 @@ class PhodSchema
      */
     public function parse(mixed $value): mixed
     {
-        $failed = fn (string $message) => throw new PhodParseFailedException($message);
+        $failed = $this->getFailedForParse();
 
         foreach ($this->validators as $validator) {
             $validator($value, $failed);
@@ -54,7 +85,7 @@ class PhodSchema
      */
     public function safeParse(mixed $value): ParseResult
     {
-        $failed = fn ($message) => new ParseResult(false, $value, $message);
+        $failed = $this->getFailedForSafeParse($value);
 
         foreach ($this->validators as $validator) {
             $result = $validator($value, $failed);
