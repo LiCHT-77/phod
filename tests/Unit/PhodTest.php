@@ -51,7 +51,7 @@ describe('bool method', function () {
 describe('array method', function () {
     it('should return an array schema', function () {
         $phod = new Phod();
-        $schema = $phod->array();
+        $schema = $phod->array([]);
         expect($schema)
             ->toBeInstanceOf(PhodSchema::class)
             ->toBeInstanceOf(ArraySchema::class);
