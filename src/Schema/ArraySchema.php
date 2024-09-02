@@ -43,7 +43,7 @@ class ArraySchema extends PhodSchema
             return new ParseResult(
                 false,
                 $value,
-                $this->messageProvider->replace($options['message'], ['key' => $context->key]),
+                $this->messageProvider->replace($options['message'], ['key' => $context->key, 'type' => 'array']),
             );
         };
 

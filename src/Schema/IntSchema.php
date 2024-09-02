@@ -64,7 +64,7 @@ class IntSchema extends PhodSchema
             return new ParseResult(
                 false,
                 $value,
-                $this->messageProvider->replace($message, ['key' => $context->key]),
+                $this->messageProvider->replace($message, ['key' => $context->key, 'type' => 'integer']),
             );
         };
 

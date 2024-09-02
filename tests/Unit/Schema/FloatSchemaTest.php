@@ -1,27 +1,8 @@
 <?php
 
 use Rei\Phod\Schema\FloatSchema;
-use Rei\Phod\Message\MessageProvider;
 use Rei\Phod\PhodParseFailedException;
 
-beforeEach(function () {
-    $this->messageProvider = new class implements MessageProvider {
-        public function get(string $key): string
-        {
-            return 'Value must be a float';
-        }
-
-        public function message(string $key, array $params = []): string
-        {
-            return 'Value must be a float';
-        }
-
-        public function replace(string $message, array $params = []): string
-        {
-            return str_replace(array_keys($params), array_values($params), $message);
-        }
-    };
-});
 
 describe('parse method', function () {
     it('should return the value if all validators return true', function () {
@@ -33,7 +14,7 @@ describe('parse method', function () {
 
     it('should throw an exception if any validator returns false', function () {
         $schema = new FloatSchema($this->messageProvider);
-        expect(fn() => $schema->parse('string'))->toThrow(PhodParseFailedException::class, 'Value must be a float');
+        expect(fn() => $schema->parse('string'))->toThrow(PhodParseFailedException::class, 'the value must be float');
     });
 
     it('should cast the value to a float', function () {
@@ -57,11 +38,11 @@ describe('safeParse method', function () {
         $result = $schema->safeParse('string');
 
         expect($result->succeed)->toBeFalse();
-        expect($result->message)->toBe('Value must be a float');
+        expect($result->message)->toBe('the value must be float');
 
         $result = $schema->safeParse(new stdClass());
         expect($result->succeed)->toBeFalse();
-        expect($result->message)->toBe('Value must be a float');
+        expect($result->message)->toBe('the value must be float');
     });
 
     it('should cast the value to a float', function () {

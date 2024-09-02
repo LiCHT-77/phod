@@ -1,5 +1,7 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
+use Tests\TestMessageProvider;
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -11,7 +13,9 @@
 |
 */
 
-// uses(Tests\TestCase::class)->in('Feature');
+uses(TestCase::class)->beforeEach(function () {
+    $this->messageProvider = new TestMessageProvider();
+})->in('Unit');
 
 /*
 |--------------------------------------------------------------------------
