@@ -10,12 +10,12 @@ final readonly class ParseResult
     /**
      * @param bool $succeed
      * @param T $value
-     * @param string $message
+     * @param string|null $message
      */
     public function __construct(
         public bool $succeed,
         public mixed $value,
-        public string $message = '',
+        public ?string $message = null,
     )
     {
         //

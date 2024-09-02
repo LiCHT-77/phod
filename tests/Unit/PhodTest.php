@@ -7,10 +7,30 @@ use Rei\Phod\Schema\BoolSchema;
 use Rei\Phod\Schema\ArraySchema;
 use Rei\Phod\Schema\FloatSchema;
 use Rei\Phod\Schema\StringSchema;
+use Rei\Phod\Message\MessageProvider;
+
+beforeEach(function () {
+    $this->messageProvider = new class implements MessageProvider {
+        public function get(string $key): string
+        {
+            return 'Value must be an integer';
+        }
+
+        public function message(string $key, array $params = []): string
+        {
+            return 'Value must be an integer';
+        }
+
+        public function replace(string $message, array $params = []): string
+        {
+            return str_replace(array_keys($params), array_values($params), $message);
+        }
+    };
+});
 
 describe('string method', function () {
     it('should return a string schema', function () {
-        $phod = new Phod();
+        $phod = new Phod($this->messageProvider);
         $schema = $phod->string();
         expect($schema)
             ->toBeInstanceOf(PhodSchema::class)
@@ -20,7 +40,7 @@ describe('string method', function () {
 
 describe('int method', function () {
     it('should return an int schema', function () {
-        $phod = new Phod();
+        $phod = new Phod($this->messageProvider);
         $schema = $phod->int();
         expect($schema)
             ->toBeInstanceOf(PhodSchema::class)
@@ -30,7 +50,7 @@ describe('int method', function () {
 
 describe('float method', function () {
     it('should return a float schema', function () {
-        $phod = new Phod();
+        $phod = new Phod($this->messageProvider);
         $schema = $phod->float();
         expect($schema)
             ->toBeInstanceOf(PhodSchema::class)
@@ -40,7 +60,7 @@ describe('float method', function () {
 
 describe('bool method', function () {
     it('should return a bool schema', function () {
-        $phod = new Phod();
+        $phod = new Phod($this->messageProvider);
         $schema = $phod->bool();
         expect($schema)
             ->toBeInstanceOf(PhodSchema::class)
@@ -50,7 +70,7 @@ describe('bool method', function () {
 
 describe('array method', function () {
     it('should return an array schema', function () {
-        $phod = new Phod();
+        $phod = new Phod($this->messageProvider);
         $schema = $phod->array([]);
         expect($schema)
             ->toBeInstanceOf(PhodSchema::class)

@@ -2,62 +2,32 @@
 
 namespace Rei\Phod;
 
+use Rei\Phod\ParseResult;
+use Rei\Phod\Message\MessageProvider;
+use Rei\Phod\PhodParseFailedException;
+
 
 /**
  * @template T
  */
 class PhodSchema
 {
+    /**
+     * @var string
+     */
+    protected string $key = 'the value';
+
+    /**
+     * construct the schema
+     *
+     * @param MessageProvider $messageProvider
+     * @param array<int, callable(mixed, ParseContext): ParseResult<T>> $validators
+     */
     public function __construct(
+        protected MessageProvider $messageProvider,
         protected array $validators = [],
-    )
-    {
+    ) {
         //
-    }
-
-    /**
-     * get the validators
-     *
-     * @return array<int, callable>
-     */
-    public function validators(): array
-    {
-        return $this->validators;
-    }
-
-    /**
-     * refine the schema
-     *
-     * @param callable $callable
-     * @return PhodSchema
-     */
-    public function refine(callable $callable): PhodSchema
-    {
-        return new static([
-            ...$this->validators,
-            $callable,
-        ]);
-    }
-
-    /**
-     * get the failed function for parse
-     *
-     * @return \Closure
-     */
-    private function getFailedForParse(): \Closure
-    {
-        return fn (string $message) => throw new PhodParseFailedException($message);
-    }
-
-    /**
-     * get the failed function for safe parse
-     *
-     *
-     * @return \Closure
-     */
-    private function getFailedForSafeParse(mixed $value): \Closure
-    {
-        return fn ($message) => new ParseResult(false, $value, $message);
     }
 
     /**
@@ -68,13 +38,13 @@ class PhodSchema
      */
     public function parse(mixed $value): mixed
     {
-        $failed = $this->getFailedForParse();
+        $result = $this->safeParse($value);
 
-        foreach ($this->validators as $validator) {
-            $validator($value, $failed);
+        if (!$result->succeed) {
+            throw new PhodParseFailedException($result->message);
         }
 
-        return $value;
+        return $result->value;
     }
 
     /**
@@ -85,15 +55,40 @@ class PhodSchema
      */
     public function safeParse(mixed $value): ParseResult
     {
-        $failed = $this->getFailedForSafeParse($value);
+        $context = new ParseContext($this->key);
 
         foreach ($this->validators as $validator) {
-            $result = $validator($value, $failed);
-            if ($result instanceof ParseResult) {
+            $result = $validator($value, $context);
+
+            if (!$result->succeed) {
                 return $result;
             }
         }
 
         return new ParseResult(true, $value);
+    }
+
+    /**
+     * set the key
+     *
+     * @param string $key
+     * @return static
+     */
+    public function key(string $key): static
+    {
+        $this->key = $key;
+
+        return $this;
+    }
+
+
+    /**
+     * get the message
+     *
+     * @param array<int, string> $replaces
+     */
+    protected function message(string $message, array $replaces = []): string
+    {
+        return strtr($message, array_map(fn($key) => ":$key", array_keys($replaces)));
     }
 }
