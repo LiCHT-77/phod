@@ -16,30 +16,26 @@ class ArraySchema extends PhodSchema
      * construct the schema
      *
      * @param MessageProvider $messageProvider
-     * @param array<string, PhodSchema> $schemas
+     * @param PhodSchema $schema
      * @param array{invalid_type_message?: string, required_message?: string} $options
      */
-    public function __construct(
-        MessageProvider $messageProvider,
-        array $schemas,
-        array $options = [],
-    ) {
+    public function __construct(MessageProvider $messageProvider, PhodSchema $schema, array $options = [])
+    {
         parent::__construct($messageProvider);
 
-        $message = $options['invalid_type_message'] ?? $this->messageProvider->get('invalid_type');
-
-        $this->isArray($message)->isValidSchema($schemas);
+        $this->isArray(['message' => $options['invalid_type_message'] ?? $messageProvider->get('invalid_type')])
+            ->isValidElements($schema);
     }
 
     /**
      * Rule to check if the value is an array.
      *
-     * @param string $message
+     * @param array{message: string} $options
      * @return static
      */
-    private function isArray(string $message): static
+    private function isArray(array $options): static
     {
-        $this->validators[] = function(mixed $value, ParseContext $context) use ($message) {
+        $this->validators[] = function(mixed $value, ParseContext $context) use ($options) {
             if (is_array($value)) {
                 return new ParseResult(true, $value);
             }
@@ -47,7 +43,7 @@ class ArraySchema extends PhodSchema
             return new ParseResult(
                 false,
                 $value,
-                $this->messageProvider->replace($message, ['key' => $context->key]),
+                $this->messageProvider->replace($options['message'], ['key' => $context->key]),
             );
         };
 
@@ -57,21 +53,16 @@ class ArraySchema extends PhodSchema
     /**
      * Rule to check if the value is valid schema.
      *
-     * @param array<string, PhodSchema> $schemas
+     * @param PhodSchema $schema
      * @return static
      */
-    private function isValidSchema(array $schemas): static
+    private function isValidElements(PhodSchema $schema): static
     {
-        $this->validators[] = function(mixed $value, ParseContext $context) use ($schemas) {
-            foreach ($value as $key => $item) {
-                $schema = $schemas[$key] ?? null;
-
-                if ($schema) {
-                    $result = $schema->safeParse($item, new ParseContext($key));
-
-                    if (!$result->succeed) {
-                        return $result;
-                    }
+        $this->validators[] = function(mixed $value, ParseContext $context) use ($schema) {
+            foreach ($value as $key => $element) {
+                $result = $schema->safeParseWithContext($element, new ParseContext($key));
+                if (!$result->succeed) {
+                    return $result;
                 }
             }
 
