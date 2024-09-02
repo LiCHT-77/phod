@@ -111,3 +111,31 @@ describe('safeParse method', function () {
         expect($result->message)->toBe('String must be at least 5 characters long');
     });
 });
+
+describe('nullable method', function () {
+    it('should return a ParseResult object if the value is nullable', function () {
+        $schema = new PhodSchema($this->messageProvider, [
+            function (mixed $value, ParseContext $context): ParseResult {
+                return new ParseResult(false, $value, 'Value must be a string');
+            },
+        ]);
+
+        $result = $schema->nullable()->safeParse(null);
+
+        expect($result->succeed)->toBeTrue();
+        expect($result->value)->toBeNull();
+    });
+
+    it('should return a ParseResult object if the value is not nullable', function () {
+        $schema = new PhodSchema($this->messageProvider, [
+            function (mixed $value, ParseContext $context): ParseResult {
+                return new ParseResult(false, $value, 'Value must be a string');
+            },
+        ]);
+
+        $result = $schema->safeParse('value');
+
+        expect($result->succeed)->toBeFalse();
+        expect($result->value)->toBe('value');
+    });
+});

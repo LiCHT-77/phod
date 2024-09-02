@@ -12,10 +12,22 @@ use Rei\Phod\PhodParseFailedException;
  */
 class PhodSchema
 {
+    private const UNSET = '__UNSET__';
+
     /**
      * @var string
      */
     protected string $key = 'the value';
+
+    /**
+     * @var bool
+     */
+    protected bool $optional = false;
+
+    /**
+     * @var bool
+     */
+    protected bool $nullable = false;
 
     /**
      * construct the schema
@@ -70,6 +82,11 @@ class PhodSchema
     protected function safeParseWithContext(mixed $value, ParseContext $context): ParseResult
     {
         $value = $this->cast($value);
+
+        if ($this->nullable && is_null($value)) {
+            return new ParseResult(true, $value);
+        }
+
         foreach ($this->validators as $validator) {
             $result = $validator($value, $context);
 
@@ -78,7 +95,7 @@ class PhodSchema
             }
         }
 
-        return new ParseResult(true, $value);
+        return new ParseResult(true, $result->value);
     }
 
     /**
@@ -94,6 +111,39 @@ class PhodSchema
         return $this;
     }
 
+    /**
+     * set the value to be optional
+     *
+     * @return static
+     */
+    public function optional(): static
+    {
+        $this->optional = true;
+
+        return $this;
+    }
+
+    /**
+     * check if the value is optional
+     *
+     * @return bool
+     */
+    public function isOptional(): bool
+    {
+        return $this->optional;
+    }
+
+    /**
+     * set the value to be nullable
+     *
+     * @return static
+     */
+    public function nullable(): static
+    {
+        $this->nullable = true;
+
+        return $this;
+    }
 
     /**
      * get the message

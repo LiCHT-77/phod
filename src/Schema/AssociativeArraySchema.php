@@ -26,9 +26,10 @@ class AssociativeArraySchema extends PhodSchema
     ) {
         parent::__construct($messageProvider);
 
-        $message = $options['invalid_type_message'] ?? $this->messageProvider->get('invalid_type');
+        $invalidTypeMessage = $options['invalid_type_message'] ?? $this->messageProvider->get('invalid_type');
+        $requiredMessage = $options['required_message'] ?? $this->messageProvider->get('required');
 
-        $this->isArray($message)->isValidSchema($schemas);
+        $this->isArray($invalidTypeMessage)->isValidSchema($schemas, $requiredMessage);
     }
 
     /**
@@ -59,7 +60,7 @@ class AssociativeArraySchema extends PhodSchema
             return new ParseResult(
                 false,
                 $value,
-                $this->messageProvider->replace($message, ['key' => $context->key]),
+                $this->messageProvider->replace($message, ['key' => $context->key, 'type' => 'array']),
             );
         };
 
@@ -70,20 +71,29 @@ class AssociativeArraySchema extends PhodSchema
      * Rule to check if the value is valid schema.
      *
      * @param array<string, PhodSchema> $schemas
+     * @param string $message
      * @return static
      */
-    private function isValidSchema(array $schemas): static
+    private function isValidSchema(array $schemas, string $message): static
     {
-        $this->validators[] = function(mixed $value, ParseContext $context) use ($schemas) {
-            foreach ($value as $key => $item) {
-                $schema = $schemas[$key] ?? null;
-
-                if ($schema) {
-                    $result = $schema->safeParseWithContext($item, new ParseContext($key));
+        $this->validators[] = function(mixed $value, ParseContext $context) use ($schemas, $message) {
+            foreach ($schemas as $key => $schema) {
+                if (!array_key_exists($key, $value)) {
+                    if (!$schema->isOptional()) {
+                        return new ParseResult(
+                            false,
+                            $value,
+                            $this->messageProvider->replace($message, ['key' => "the {$key}"]),
+                        );
+                    }
+                } else {
+                    $result = $schema->safeParseWithContext($value[$key], new ParseContext($key));
 
                     if (!$result->succeed) {
                         return $result;
                     }
+
+                    $value[$key] = $result->value;
                 }
             }
 
