@@ -28,6 +28,18 @@ class FloatSchema extends PhodSchema
     }
 
     /**
+     * @inheritDoc
+     */
+    protected function cast(mixed $value): mixed
+    {
+        if (is_numeric($value)) {
+            return (float) $value;
+        }
+
+        return $value;
+    }
+
+    /**
      * Rule to check if the value is a float.
      *
      * @param array{message?: string} $options

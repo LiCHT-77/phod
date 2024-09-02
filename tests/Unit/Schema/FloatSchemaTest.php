@@ -35,6 +35,13 @@ describe('parse method', function () {
         $schema = new FloatSchema($this->messageProvider);
         expect(fn() => $schema->parse('string'))->toThrow(PhodParseFailedException::class, 'Value must be a float');
     });
+
+    it('should cast the value to a float', function () {
+        $schema = new FloatSchema($this->messageProvider);
+        $result = $schema->parse('1.23');
+
+        expect($result)->toBe(1.23);
+    });
 });
 
 describe('safeParse method', function () {
@@ -52,8 +59,26 @@ describe('safeParse method', function () {
         expect($result->succeed)->toBeFalse();
         expect($result->message)->toBe('Value must be a float');
 
-        $result = $schema->safeParse(123);
+        $result = $schema->safeParse(new stdClass());
         expect($result->succeed)->toBeFalse();
         expect($result->message)->toBe('Value must be a float');
+    });
+
+    it('should cast the value to a float', function () {
+        $schema = new FloatSchema($this->messageProvider);
+        $result = $schema->safeParse('1.23');
+
+        expect($result->succeed)->toBeTrue();
+        expect($result->value)->toBe(1.23);
+
+        $result = $schema->safeParse(2);
+        expect($result->succeed)->toBeTrue();
+        expect($result->value)->toBe(2.0);
+
+        $result = $schema->safeParse(null);
+        expect($result->value)->toBeNull();
+
+        $result = $schema->safeParse(new stdClass());
+        expect($result->value)->toBeInstanceOf(stdClass::class);
     });
 });

@@ -33,7 +33,12 @@ describe('parse method', function () {
 
     it('should throw an exception if any validator returns false', function () {
         $schema = new StringSchema($this->messageProvider);
-        expect(fn() => $schema->parse(123))->toThrow(PhodParseFailedException::class, 'Value must be a string');
+        expect(fn() => $schema->parse(new stdClass()))->toThrow(PhodParseFailedException::class, 'Value must be a string');
+    });
+
+    it('should cast the value to a string', function () {
+        $schema = new StringSchema($this->messageProvider);
+        expect($schema->parse(123))->toBe('123');
     });
 });
 
@@ -47,9 +52,21 @@ describe('safeParse method', function () {
 
     it('should return a PaseResult object with the correct message if the value is not a string', function () {
         $schema = new StringSchema($this->messageProvider);
-        $result = $schema->safeParse(123);
+        $result = $schema->safeParse(new stdClass());
 
         expect($result->succeed)->toBeFalse();
         expect($result->message)->toBe('Value must be a string');
+    });
+
+    it('should cast the value to a string', function () {
+        $schema = new StringSchema($this->messageProvider);
+        $result = $schema->safeParse(123);
+        expect($result->value)->toBe('123');
+
+        $result = $schema->safeParse(null);
+        expect($result->value)->toBeNull();
+
+        $result = $schema->safeParse(new stdClass());
+        expect($result->value)->toBeInstanceOf(stdClass::class);
     });
 });
