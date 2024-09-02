@@ -28,6 +28,20 @@ class BoolSchema extends PhodSchema
     }
 
     /**
+     * @inheritDoc
+     */
+    protected function cast(mixed $value): mixed
+    {
+        $casted = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+        if ($casted === null) {
+            return $value;
+        }
+
+        return $casted;
+    }
+
+    /**
      * Rule to check if the value is a boolean.
      *
      * @param array{message?: string} $options

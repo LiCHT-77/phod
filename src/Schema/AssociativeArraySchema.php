@@ -32,6 +32,18 @@ class AssociativeArraySchema extends PhodSchema
     }
 
     /**
+     * @inheritDoc
+    */
+    protected function cast(mixed $value): mixed
+    {
+        if (is_scalar($value) || is_null($value)) {
+            return $value;
+        }
+
+        return (array) $value;
+    }
+
+    /**
      * Rule to check if the value is an array.
      *
      * @param string $message

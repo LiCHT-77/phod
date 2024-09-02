@@ -28,6 +28,25 @@ class IntSchema extends PhodSchema
     }
 
     /**
+     * @inheritDoc
+     */
+    protected function cast(mixed $value): mixed
+    {
+        if (is_numeric($value)) {
+            $intCasted = (int) $value;
+            $floatCasted = (float) $value;
+
+            if ($intCasted == $floatCasted) {
+                return $intCasted;
+            } else {
+                return $floatCasted;
+            }
+        }
+
+        return $value;
+    }
+
+    /**
      * Rule to check if the value is an integer.
      *
      * @param array{message?: string} $options

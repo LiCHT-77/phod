@@ -45,6 +45,23 @@ describe('parse method', function () {
             'age' => 30,
         ]);
     });
+
+    it('should cast the value to an array', function () {
+        $schema = new AssociativeArraySchema($this->messageProvider, [
+            'name' => new StringSchema($this->messageProvider),
+            'age' => new IntSchema($this->messageProvider),
+        ]);
+
+        $data = new stdClass();
+        $data->name = 'John';
+        $data->age = 30;
+
+        $result = $schema->parse($data);
+        expect($result)->toBe([
+            'name' => 'John',
+            'age' => 30,
+        ]);
+    });
 });
 
 describe('safeParse method', function () {
@@ -59,5 +76,23 @@ describe('safeParse method', function () {
         $result = $schema->safeParse('string');
         expect($result->succeed)->toBeFalse();
         expect($result->message)->toBe('Value must be an array');
+    });
+
+    it('should cast the value to an array', function () {
+        $schema = new AssociativeArraySchema($this->messageProvider, [
+            'name' => new StringSchema($this->messageProvider),
+            'age' => new IntSchema($this->messageProvider),
+        ]);
+
+        $data = new stdClass();
+        $data->name = 'John';
+        $data->age = 30;
+
+        $result = $schema->safeParse($data);
+        expect($result->succeed)->toBeTrue();
+        expect($result->value)->toBe([
+            'name' => 'John',
+            'age' => 30,
+        ]);
     });
 });

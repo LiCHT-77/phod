@@ -69,6 +69,7 @@ class PhodSchema
      */
     protected function safeParseWithContext(mixed $value, ParseContext $context): ParseResult
     {
+        $value = $this->cast($value);
         foreach ($this->validators as $validator) {
             $result = $validator($value, $context);
 
@@ -102,5 +103,16 @@ class PhodSchema
     protected function message(string $message, array $replaces = []): string
     {
         return strtr($message, array_map(fn($key) => ":$key", array_keys($replaces)));
+    }
+
+    /**
+     * cast the value
+     *
+     * @param mixed $value
+     * @return T
+     */
+    protected function cast(mixed $value): mixed
+    {
+        return $value;
     }
 }

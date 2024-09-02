@@ -35,6 +35,12 @@ describe('parse method', function () {
         $schema = new BoolSchema($this->messageProvider);
         expect(fn() => $schema->parse('string'))->toThrow(PhodParseFailedException::class, 'Value must be a boolean');
     });
+
+    it('should cast the value to a boolean', function () {
+        $schema = new BoolSchema($this->messageProvider);
+        expect($schema->parse(1))->toBeTrue();
+        expect($schema->parse(0))->toBeFalse();
+    });
 });
 
 describe('safeParse method', function () {
@@ -51,5 +57,16 @@ describe('safeParse method', function () {
 
         expect($result->succeed)->toBeFalse();
         expect($result->message)->toBe('Value must be a boolean');
+    });
+
+    it('should cast the value to a boolean', function () {
+        $schema = new BoolSchema($this->messageProvider);
+        $result = $schema->safeParse(1);
+        expect($result->succeed)->toBeTrue();
+        expect($result->value)->toBeTrue();
+
+        $result = $schema->safeParse(0);
+        expect($result->succeed)->toBeTrue();
+        expect($result->value)->toBeFalse();
     });
 });

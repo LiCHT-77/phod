@@ -28,6 +28,18 @@ class StringSchema extends PhodSchema
     }
 
     /**
+     * @inheritDoc
+     */
+    protected function cast(mixed $value): mixed
+    {
+        if (is_null($value) || is_object($value) && !($value instanceof \Stringable)) {
+            return $value;
+        }
+
+        return (string) $value;
+    }
+
+    /**
      * Rule to check if the value is a string.
      *
      * @param array{message?: string} $options
