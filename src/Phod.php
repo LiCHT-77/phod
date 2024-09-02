@@ -4,7 +4,7 @@ namespace Rei\Phod;
 
 use Rei\Phod\Schema\IntSchema;
 use Rei\Phod\Schema\BoolSchema;
-use Rei\Phod\Schema\ArraySchema;
+use Rei\Phod\Schema\AssociativeArraySchema;
 use Rei\Phod\Schema\FloatSchema;
 use Rei\Phod\Schema\StringSchema;
 use Rei\Phod\Message\MessageProvider;
@@ -64,14 +64,14 @@ class Phod
     }
 
     /**
-     * Make an ArraySchema.
+     * Make an AssociativeArraySchema.
      *
-     * @param array<int, mixed> $data
+     * @param array<string, PhodSchema> $data
      * @param array{invalid_type_message?: string, required_message?: string} $options
-     * @return ArraySchema
+     * @return AssociativeArraySchema
      */
-    public function array(array $data = [], array $options = []): ArraySchema
+    public function array(array $data = [], array $options = []): AssociativeArraySchema
     {
-        return new ArraySchema($this->messageProvider, $data, $options);
+        return new AssociativeArraySchema($this->messageProvider, $data, $options);
     }
 }

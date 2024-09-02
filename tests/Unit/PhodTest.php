@@ -4,7 +4,7 @@ use Rei\Phod\Phod;
 use Rei\Phod\PhodSchema;
 use Rei\Phod\Schema\IntSchema;
 use Rei\Phod\Schema\BoolSchema;
-use Rei\Phod\Schema\ArraySchema;
+use Rei\Phod\Schema\AssociativeArraySchema;
 use Rei\Phod\Schema\FloatSchema;
 use Rei\Phod\Schema\StringSchema;
 use Rei\Phod\Message\MessageProvider;
@@ -74,6 +74,6 @@ describe('array method', function () {
         $schema = $phod->array([]);
         expect($schema)
             ->toBeInstanceOf(PhodSchema::class)
-            ->toBeInstanceOf(ArraySchema::class);
+            ->toBeInstanceOf(AssociativeArraySchema::class);
     });
 });

@@ -57,6 +57,18 @@ class PhodSchema
     {
         $context = new ParseContext($this->key);
 
+        return $this->safeParseWithContext($value, $context);
+    }
+
+    /**
+     * parse the value with context
+     *
+     * @param mixed $value
+     * @param ParseContext $context
+     * @return ParseResult<T>
+     */
+    protected function safeParseWithContext(mixed $value, ParseContext $context): ParseResult
+    {
         foreach ($this->validators as $validator) {
             $result = $validator($value, $context);
 

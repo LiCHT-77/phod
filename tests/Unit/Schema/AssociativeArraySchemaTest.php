@@ -1,11 +1,10 @@
 <?php
 
-use Rei\Phod\ParseResult;
-use Rei\Phod\Schema\ArraySchema;
+use Rei\Phod\Schema\IntSchema;
+use Rei\Phod\Schema\AssociativeArraySchema;
 use Rei\Phod\Schema\StringSchema;
 use Rei\Phod\Message\MessageProvider;
 use Rei\Phod\PhodParseFailedException;
-
 
 beforeEach(function () {
     $this->messageProvider = new class implements MessageProvider {
@@ -28,31 +27,35 @@ beforeEach(function () {
 
 describe('parse method', function () {
     it('should throw an exception if any validator returns false', function () {
-        $schema = new ArraySchema($this->messageProvider, new StringSchema($this->messageProvider));
+        $schema = new AssociativeArraySchema($this->messageProvider, []);
         expect(fn() => $schema->parse('string'))->toThrow(PhodParseFailedException::class, 'Value must be an array');
     });
 
     it('should return the value if all validators return true', function () {
-        $schema = new ArraySchema($this->messageProvider, new StringSchema($this->messageProvider));
-        expect($schema->parse([]))->toBe([]);
+        $schema = new AssociativeArraySchema($this->messageProvider, [
+            'name' => new StringSchema($this->messageProvider),
+            'age' => new IntSchema($this->messageProvider),
+        ]);
+        $result = $schema->parse([
+            'name' => 'John',
+            'age' => 30,
+        ]);
+        expect($result)->toBe([
+            'name' => 'John',
+            'age' => 30,
+        ]);
     });
 });
 
 describe('safeParse method', function () {
-    it('should return a ParseResult', function () {
-        $schema = new ArraySchema($this->messageProvider, new StringSchema($this->messageProvider));
-        expect($schema->safeParse([]))->toBeInstanceOf(ParseResult::class);
-    });
-
-    it('should return a ParseResult with the value if all validators return true', function () {
-        $schema = new ArraySchema($this->messageProvider, new StringSchema($this->messageProvider));
+    it('should return a PaseResult object', function () {
+        $schema = new AssociativeArraySchema($this->messageProvider, []);
         $result = $schema->safeParse([]);
         expect($result->succeed)->toBeTrue();
-        expect($result->value)->toBe([]);
     });
 
-    it('should return a ParseResult with the message if any validator returns false', function () {
-        $schema = new ArraySchema($this->messageProvider, new StringSchema($this->messageProvider));
+    it('should return a PaseResult object with the correct message if the value is not an array', function () {
+        $schema = new AssociativeArraySchema($this->messageProvider, []);
         $result = $schema->safeParse('string');
         expect($result->succeed)->toBeFalse();
         expect($result->message)->toBe('Value must be an array');
