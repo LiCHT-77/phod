@@ -1,47 +1,64 @@
 <?php
 
-use Rei\Phod\PhodParseFailedException;
 use Rei\Phod\PhodSchema;
+use Rei\Phod\ParseResult;
+use Rei\Phod\ParseContext;
+use Rei\Phod\Message\MessageProvider;
+use Rei\Phod\PhodParseFailedException;
 
-describe('refine method', function () {
-    it('should return a new schema with the given callable', function () {
-        $schema = new PhodSchema();
-        $newSchema = $schema->refine(function ($value, $failed) {
-            return $value;
-        });
+beforeEach(function () {
+    $this->messageProvider = new class implements MessageProvider {
+        public function get(string $key): string
+        {
+            return 'Value must be a string';
+        }
 
-        expect($newSchema)
-            ->toBeInstanceOf(PhodSchema::class)
-            ->not
-            ->toBe($schema);
-    });
+        public function message(string $key, array $params = []): string
+        {
+            return 'Value must be a string';
+        }
 
-    it('should merge the new callable with the existing ones', function () {
-        $schema = new PhodSchema([
-            fn($value, $failed) => is_string($value) ?: $failed('Value must be a string'),
-        ]);
-
-        $newSchema = $schema->refine(fn($value, $failed) => strlen($value) >= 5 ?: $failed('String must be at least 5 characters long'));
-
-        expect($newSchema->parse('value'))->toBe('value');
-        expect(fn() => $newSchema->parse('123'))->toThrow(PhodParseFailedException::class, 'String must be at least 5 characters long');
-    });
+        public function replace(string $message, array $params = []): string
+        {
+            return str_replace(array_keys($params), array_values($params), $message);
+        }
+    };
 });
 
 describe('parse method', function () {
     it('should return the value if all validators return true', function () {
-        $schema = new PhodSchema([
-            fn($value, $failed) => is_string($value) ?: $failed('Value must be a string'),
-            fn($value, $failed) => strlen($value) >= 5 ?: $failed('String must be at least 5 characters long'),
+        $schema = new PhodSchema($this->messageProvider, [
+            function (mixed $value, ParseContext $context): ParseResult {
+                if (is_string($value)) {
+                    return new ParseResult(true, $value);
+                }
+                return new ParseResult(false, $value, 'Value must be a string');
+            },
+            function (mixed $value, ParseContext $context): ParseResult {
+                if (strlen($value) >= 5) {
+                    return new ParseResult(true, $value);
+                }
+                return new ParseResult(false, $value, 'String must be at least 5 characters long');
+            },
         ]);
 
         expect($schema->parse('value'))->toBe('value');
     });
 
     it('should throw an exception if any validator returns false', function () {
-        $schema = new PhodSchema([
-            fn($value, $failed) => is_string($value) ?: $failed('Value must be a string'),
-            fn($value, $failed) => strlen($value) >= 5 ?: $failed('String must be at least 5 characters long'),
+        $schema = new PhodSchema($this->messageProvider, [
+            function (mixed $value, ParseContext $context): ParseResult {
+                if (is_string($value)) {
+                    return new ParseResult(true, $value);
+                }
+                return new ParseResult(false, $value, 'Value must be a string');
+            },
+            function (mixed $value, ParseContext $context): ParseResult {
+                if (strlen($value) >= 5) {
+                    return new ParseResult(true, $value);
+                }
+                return new ParseResult(false, $value, 'String must be at least 5 characters long');
+            },
         ]);
 
         expect(fn() => $schema->parse('123'))->toThrow(PhodParseFailedException::class, 'String must be at least 5 characters long');
@@ -49,10 +66,20 @@ describe('parse method', function () {
 });
 
 describe('safeParse method', function () {
-    it('should return a PaseResult object', function () {
-        $schema = new PhodSchema([
-            fn($value, $failed) => is_string($value) ?: $failed('Value must be a string'),
-            fn($value, $failed) => strlen($value) >= 5 ?: $failed('String must be at least 5 characters long'),
+    it('should return a ParseResult object', function () {
+        $schema = new PhodSchema($this->messageProvider, [
+            function (mixed $value, ParseContext $context): ParseResult {
+                if (is_string($value)) {
+                    return new ParseResult(true, $value);
+                }
+                return new ParseResult(false, $value, 'Value must be a string');
+            },
+            function (mixed $value, ParseContext $context): ParseResult {
+                if (strlen($value) >= 5) {
+                    return new ParseResult(true, $value);
+                }
+                return new ParseResult(false, $value, 'String must be at least 5 characters long');
+            },
         ]);
 
         $result = $schema->safeParse('value');
@@ -62,9 +89,19 @@ describe('safeParse method', function () {
     });
 
     it('should return a failed ParseResult object if any validator returns false', function () {
-        $schema = new PhodSchema([
-            fn($value, $failed) => is_string($value) ?: $failed('Value must be a string'),
-            fn($value, $failed) => strlen($value) >= 5 ?: $failed('String must be at least 5 characters long'),
+        $schema = new PhodSchema($this->messageProvider, [
+            function (mixed $value, ParseContext $context): ParseResult {
+                if (is_string($value)) {
+                    return new ParseResult(true, $value);
+                }
+                return new ParseResult(false, $value, 'Value must be a string');
+            },
+            function (mixed $value, ParseContext $context): ParseResult {
+                if (strlen($value) >= 5) {
+                    return new ParseResult(true, $value);
+                }
+                return new ParseResult(false, $value, 'String must be at least 5 characters long');
+            },
         ]);
 
         $result = $schema->safeParse('123');
