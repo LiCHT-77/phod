@@ -146,6 +146,19 @@ class PhodSchema
     }
 
     /**
+     * refine the schema
+     *
+     * @param callable(mixed, ParseContext): ParseResult<T> $validator
+     * @return static
+     */
+    public function refine(callable $validator): static
+    {
+        $this->validators[] = $validator;
+
+        return $this;
+    }
+
+    /**
      * get the message
      *
      * @param array<int, string> $replaces

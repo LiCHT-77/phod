@@ -139,3 +139,18 @@ describe('nullable method', function () {
         expect($result->value)->toBe('value');
     });
 });
+
+describe('refine method', function () {
+    it('should add any validator to the schema', function () {
+        $schema = new PhodSchema($this->messageProvider, []);
+
+        $schema->refine(function (mixed $value, ParseContext $context): ParseResult {
+            return new ParseResult(false, $value, 'refine');
+        });
+
+        $result = $schema->safeParse('value');
+
+        expect($result->succeed)->toBeFalse();
+        expect($result->message)->toBe('refine');
+    });
+});
