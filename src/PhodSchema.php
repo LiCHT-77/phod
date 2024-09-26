@@ -15,9 +15,9 @@ class PhodSchema
     private const UNSET = '__UNSET__';
 
     /**
-     * @var string
+     * @var string|null
      */
-    protected string $key = 'the value';
+    protected ?string $key = null;
 
     /**
      * @var bool
@@ -52,8 +52,8 @@ class PhodSchema
     {
         $result = $this->safeParse($value);
 
-        if (!$result->succeed) {
-            throw new PhodParseFailedException($result->message);
+        if (!$result->success) {
+            throw $result->exception;
         }
 
         return $result->value;
@@ -67,7 +67,7 @@ class PhodSchema
      */
     public function safeParse(mixed $value): ParseResult
     {
-        $context = new ParseContext($this->key);
+        $context = new ParseContext([], $this->key ?? 'the value');
 
         return $this->safeParseWithContext($value, $context);
     }
@@ -90,7 +90,7 @@ class PhodSchema
         foreach ($this->validators as $validator) {
             $result = $validator($value, $context);
 
-            if (!$result->succeed) {
+            if (!$result->success) {
                 return $result;
             }
         }
@@ -109,6 +109,16 @@ class PhodSchema
         $this->key = $key;
 
         return $this;
+    }
+
+    /**
+     * get the key
+     *
+     * @return string|null
+     */
+    public function getKey(): ?string
+    {
+        return $this->key;
     }
 
     /**

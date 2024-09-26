@@ -5,7 +5,9 @@ namespace Rei\Phod\Schema;
 use Rei\Phod\PhodSchema;
 use Rei\Phod\ParseResult;
 use Rei\Phod\ParseContext;
+use Rei\Phod\PhodParseIssue;
 use Rei\Phod\Message\MessageProvider;
+use Rei\Phod\PhodParseFailedException;
 
 /**
  * @extends \Rei\Phod\PhodSchema<array>
@@ -60,7 +62,13 @@ class AssociativeArraySchema extends PhodSchema
             return new ParseResult(
                 false,
                 $value,
-                $this->messageProvider->replace($message, ['key' => $context->key, 'type' => 'array']),
+                new PhodParseFailedException(
+                    new PhodParseIssue(
+                        'invalid_type',
+                        $context->path,
+                        $this->messageProvider->replace($message, ['key' => $context->key, 'type' => 'array']),
+                    ),
+                ),
             );
         };
 
@@ -83,13 +91,19 @@ class AssociativeArraySchema extends PhodSchema
                         return new ParseResult(
                             false,
                             $value,
-                            $this->messageProvider->replace($message, ['key' => "the {$key}"]),
+                            new PhodParseFailedException(
+                                new PhodParseIssue(
+                                    'required',
+                                    $context->path,
+                                    $this->messageProvider->replace($message, ['key' => "the {$key}"]),
+                                ),
+                            ),
                         );
                     }
                 } else {
-                    $result = $schema->safeParseWithContext($value[$key], new ParseContext($key));
+                    $result = $schema->safeParseWithContext($value[$key], new ParseContext([...$context->path, $key], $key));
 
-                    if (!$result->succeed) {
+                    if (!$result->success) {
                         return $result;
                     }
 

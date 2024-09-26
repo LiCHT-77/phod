@@ -1,9 +1,10 @@
 <?php
 
+use Rei\Phod\PhodParseIssue;
 use Rei\Phod\Schema\IntSchema;
-use Rei\Phod\Schema\AssociativeArraySchema;
 use Rei\Phod\Schema\StringSchema;
 use Rei\Phod\PhodParseFailedException;
+use Rei\Phod\Schema\AssociativeArraySchema;
 
 describe('parse method', function () {
     it('should throw an exception if any validator returns false', function () {
@@ -48,18 +49,22 @@ describe('safeParse method', function () {
     it('should return a PaseResult object', function () {
         $schema = new AssociativeArraySchema($this->messageProvider, []);
         $result = $schema->safeParse([]);
-        expect($result->succeed)->toBeTrue();
+        expect($result->success)->toBeTrue();
     });
 
     it('should return a PaseResult object with the correct message if the value is not an array', function () {
         $schema = new AssociativeArraySchema($this->messageProvider, []);
         $result = $schema->safeParse('string');
-        expect($result->succeed)->toBeFalse();
-        expect($result->message)->toBe('the value must be array');
+        expect($result->success)->toBeFalse();
+        expect($result->exception)->toBeInstanceOf(PhodParseFailedException::class);
+        expect($result->exception->issue)->toBeInstanceOf(PhodParseIssue::class);
+        expect($result->exception->issue->message)->toBe('the value must be array');
 
         $result = $schema->safeParse(null);
-        expect($result->succeed)->toBeFalse();
-        expect($result->message)->toBe('the value must be array');
+        expect($result->success)->toBeFalse();
+        expect($result->exception)->toBeInstanceOf(PhodParseFailedException::class);
+        expect($result->exception->issue)->toBeInstanceOf(PhodParseIssue::class);
+        expect($result->exception->issue->message)->toBe('the value must be array');
     });
 
     it('should cast the value to an array', function () {
@@ -73,7 +78,7 @@ describe('safeParse method', function () {
         $data->age = 30;
 
         $result = $schema->safeParse($data);
-        expect($result->succeed)->toBeTrue();
+        expect($result->success)->toBeTrue();
         expect($result->value)->toBe([
             'name' => 'John',
             'age' => 30,
@@ -90,7 +95,7 @@ describe('safeParse method', function () {
             'name' => 'John',
             'age' => '30',
         ]);
-        expect($result->succeed)->toBeTrue();
+        expect($result->success)->toBeTrue();
         expect($result->value)->toBe([
             'name' => 'John',
             'age' => 30,
@@ -110,7 +115,7 @@ describe('optional method', function () {
             'name' => (new StringSchema($this->messageProvider))->optional(),
         ]);
         $result = $schema->safeParse([]);
-        expect($result->succeed)->toBeTrue();
+        expect($result->success)->toBeTrue();
         expect($result->value)->toBe([]);
     });
 
@@ -121,8 +126,10 @@ describe('optional method', function () {
         $result = $schema->safeParse([
             'age' => 30,
         ]);
-        expect($result->succeed)->toBeFalse();
-        expect($result->message)->toBe('the name is required');
+        expect($result->success)->toBeFalse();
+        expect($result->exception)->toBeInstanceOf(PhodParseFailedException::class);
+        expect($result->exception->issue)->toBeInstanceOf(PhodParseIssue::class);
+        expect($result->exception->issue->message)->toBe('the name is required');
     });
 });
 
@@ -134,7 +141,7 @@ describe('nullable method', function () {
         $result = $schema->safeParse([
             'name' => null,
         ]);
-        expect($result->succeed)->toBeTrue();
+        expect($result->success)->toBeTrue();
         expect($result->value)->toBe([
             'name' => null,
         ]);

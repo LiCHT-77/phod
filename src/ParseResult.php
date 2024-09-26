@@ -8,14 +8,14 @@ namespace Rei\Phod;
 final readonly class ParseResult
 {
     /**
-     * @param bool $succeed
+     * @param bool $success
      * @param T $value
-     * @param string|null $message
+     * @param PhodParseFailedException|null $exception
      */
     public function __construct(
-        public bool $succeed,
+        public bool $success,
         public mixed $value,
-        public ?string $message = null,
+        public ?PhodParseFailedException $exception = null,
     )
     {
         //

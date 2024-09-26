@@ -1,6 +1,7 @@
 <?php
 
 use Rei\Phod\ParseResult;
+use Rei\Phod\PhodParseIssue;
 use Rei\Phod\Schema\ArraySchema;
 use Rei\Phod\Schema\StringSchema;
 use Rei\Phod\PhodParseFailedException;
@@ -27,14 +28,16 @@ describe('safeParse method', function () {
     it('should return a ParseResult with the value if all validators return true', function () {
         $schema = new ArraySchema($this->messageProvider, new StringSchema($this->messageProvider));
         $result = $schema->safeParse([]);
-        expect($result->succeed)->toBeTrue();
+        expect($result->success)->toBeTrue();
         expect($result->value)->toBe([]);
     });
 
     it('should return a ParseResult with the message if any validator returns false', function () {
         $schema = new ArraySchema($this->messageProvider, new StringSchema($this->messageProvider));
         $result = $schema->safeParse('string');
-        expect($result->succeed)->toBeFalse();
-        expect($result->message)->toBe('the value must be array');
+        expect($result->success)->toBeFalse();
+        expect($result->exception)->toBeInstanceOf(PhodParseFailedException::class);
+        expect($result->exception->issue)->toBeInstanceOf(PhodParseIssue::class);
+        expect($result->exception->issue->message)->toBe('the value must be array');
     });
 });

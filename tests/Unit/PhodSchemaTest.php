@@ -3,6 +3,7 @@
 use Rei\Phod\PhodSchema;
 use Rei\Phod\ParseResult;
 use Rei\Phod\ParseContext;
+use Rei\Phod\PhodParseIssue;
 use Rei\Phod\Message\MessageProvider;
 use Rei\Phod\PhodParseFailedException;
 
@@ -32,13 +33,33 @@ describe('parse method', function () {
                 if (is_string($value)) {
                     return new ParseResult(true, $value);
                 }
-                return new ParseResult(false, $value, 'Value must be a string');
+                return new ParseResult(
+                    false,
+                    $value,
+                    new PhodParseFailedException(
+                        new PhodParseIssue(
+                            'invalid_type',
+                            $context->path,
+                            'Value must be a string',
+                        ),
+                    ),
+                );
             },
             function (mixed $value, ParseContext $context): ParseResult {
                 if (strlen($value) >= 5) {
                     return new ParseResult(true, $value);
                 }
-                return new ParseResult(false, $value, 'String must be at least 5 characters long');
+                return new ParseResult(
+                    false,
+                    $value,
+                    new PhodParseFailedException(
+                        new PhodParseIssue(
+                            'invalid_type',
+                            $context->path,
+                            'String must be at least 5 characters long',
+                        ),
+                    ),
+                );
             },
         ]);
 
@@ -51,13 +72,33 @@ describe('parse method', function () {
                 if (is_string($value)) {
                     return new ParseResult(true, $value);
                 }
-                return new ParseResult(false, $value, 'Value must be a string');
+                return new ParseResult(
+                    false,
+                    $value,
+                    new PhodParseFailedException(
+                        new PhodParseIssue(
+                            'invalid_type',
+                            $context->path,
+                            'Value must be a string',
+                        ),
+                    ),
+                );
             },
             function (mixed $value, ParseContext $context): ParseResult {
                 if (strlen($value) >= 5) {
                     return new ParseResult(true, $value);
                 }
-                return new ParseResult(false, $value, 'String must be at least 5 characters long');
+                return new ParseResult(
+                    false,
+                    $value,
+                    new PhodParseFailedException(
+                        new PhodParseIssue(
+                            'invalid_type',
+                            $context->path,
+                            'String must be at least 5 characters long',
+                        ),
+                    ),
+                );
             },
         ]);
 
@@ -72,19 +113,39 @@ describe('safeParse method', function () {
                 if (is_string($value)) {
                     return new ParseResult(true, $value);
                 }
-                return new ParseResult(false, $value, 'Value must be a string');
+                return new ParseResult(
+                    false,
+                    $value,
+                    new PhodParseFailedException(
+                        new PhodParseIssue(
+                            'invalid_type',
+                            $context->path,
+                            'Value must be a string',
+                        ),
+                    ),
+                );
             },
             function (mixed $value, ParseContext $context): ParseResult {
                 if (strlen($value) >= 5) {
                     return new ParseResult(true, $value);
                 }
-                return new ParseResult(false, $value, 'String must be at least 5 characters long');
+                return new ParseResult(
+                    false,
+                    $value,
+                    new PhodParseFailedException(
+                        new PhodParseIssue(
+                            'invalid_type',
+                            $context->path,
+                            'String must be at least 5 characters long',
+                        ),
+                    ),
+                );
             },
         ]);
 
         $result = $schema->safeParse('value');
 
-        expect($result->succeed)->toBeTrue();
+        expect($result->success)->toBeTrue();
         expect($result->value)->toBe('value');
     });
 
@@ -94,21 +155,43 @@ describe('safeParse method', function () {
                 if (is_string($value)) {
                     return new ParseResult(true, $value);
                 }
-                return new ParseResult(false, $value, 'Value must be a string');
+                return new ParseResult(
+                    false,
+                    $value,
+                    new PhodParseFailedException(
+                        new PhodParseIssue(
+                            'invalid_type',
+                            $context->path,
+                            'Value must be a string',
+                        ),
+                    ),
+                );
             },
             function (mixed $value, ParseContext $context): ParseResult {
                 if (strlen($value) >= 5) {
                     return new ParseResult(true, $value);
                 }
-                return new ParseResult(false, $value, 'String must be at least 5 characters long');
+                return new ParseResult(
+                    false,
+                    $value,
+                    new PhodParseFailedException(
+                        new PhodParseIssue(
+                            'invalid_type',
+                            $context->path,
+                            'String must be at least 5 characters long',
+                        ),
+                    ),
+                );
             },
         ]);
 
         $result = $schema->safeParse('123');
 
-        expect($result->succeed)->toBeFalse();
+        expect($result->success)->toBeFalse();
         expect($result->value)->toBe('123');
-        expect($result->message)->toBe('String must be at least 5 characters long');
+        expect($result->exception)->toBeInstanceOf(PhodParseFailedException::class);
+        expect($result->exception->issue)->toBeInstanceOf(PhodParseIssue::class);
+        expect($result->exception->issue->message)->toBe('String must be at least 5 characters long');
     });
 });
 
@@ -116,26 +199,42 @@ describe('nullable method', function () {
     it('should return a ParseResult object if the value is nullable', function () {
         $schema = new PhodSchema($this->messageProvider, [
             function (mixed $value, ParseContext $context): ParseResult {
-                return new ParseResult(false, $value, 'Value must be a string');
+                return new ParseResult(false, $value,
+                    new PhodParseFailedException(
+                        new PhodParseIssue(
+                            'invalid_type',
+                            $context->path,
+                            'Value must be a string',
+                        ),
+                    ),
+                );
             },
         ]);
 
         $result = $schema->nullable()->safeParse(null);
 
-        expect($result->succeed)->toBeTrue();
+        expect($result->success)->toBeTrue();
         expect($result->value)->toBeNull();
     });
 
     it('should return a ParseResult object if the value is not nullable', function () {
         $schema = new PhodSchema($this->messageProvider, [
             function (mixed $value, ParseContext $context): ParseResult {
-                return new ParseResult(false, $value, 'Value must be a string');
+                return new ParseResult(false, $value,
+                    new PhodParseFailedException(
+                        new PhodParseIssue(
+                            'invalid_type',
+                            $context->path,
+                            'Value must be a string',
+                        ),
+                    ),
+                );
             },
         ]);
 
         $result = $schema->safeParse('value');
 
-        expect($result->succeed)->toBeFalse();
+        expect($result->success)->toBeFalse();
         expect($result->value)->toBe('value');
     });
 });
@@ -145,12 +244,22 @@ describe('refine method', function () {
         $schema = new PhodSchema($this->messageProvider, []);
 
         $schema->refine(function (mixed $value, ParseContext $context): ParseResult {
-            return new ParseResult(false, $value, 'refine');
+            return new ParseResult(false, $value,
+                new PhodParseFailedException(
+                    new PhodParseIssue(
+                        'invalid_type',
+                        $context->path,
+                        'refine',
+                    ),
+                ),
+            );
         });
 
         $result = $schema->safeParse('value');
 
-        expect($result->succeed)->toBeFalse();
-        expect($result->message)->toBe('refine');
+        expect($result->success)->toBeFalse();
+        expect($result->exception)->toBeInstanceOf(PhodParseFailedException::class);
+        expect($result->exception->issue)->toBeInstanceOf(PhodParseIssue::class);
+        expect($result->exception->issue->message)->toBe('refine');
     });
 });

@@ -1,5 +1,6 @@
 <?php
 
+use Rei\Phod\PhodParseIssue;
 use Rei\Phod\Schema\BoolSchema;
 use Rei\Phod\PhodParseFailedException;
 
@@ -28,25 +29,27 @@ describe('safeParse method', function () {
         $schema = new BoolSchema($this->messageProvider);
         $result = $schema->safeParse(true);
 
-        expect($result->succeed)->toBeTrue();
+        expect($result->success)->toBeTrue();
     });
 
     it('should return a ParseResult object with the correct message if the value is not a boolean', function () {
         $schema = new BoolSchema($this->messageProvider);
         $result = $schema->safeParse('string');
 
-        expect($result->succeed)->toBeFalse();
-        expect($result->message)->toBe('the value must be boolean');
+        expect($result->success)->toBeFalse();
+        expect($result->exception)->toBeInstanceOf(PhodParseFailedException::class);
+        expect($result->exception->issue)->toBeInstanceOf(PhodParseIssue::class);
+        expect($result->exception->issue->message)->toBe('the value must be boolean');
     });
 
     it('should cast the value to a boolean', function () {
         $schema = new BoolSchema($this->messageProvider);
         $result = $schema->safeParse(1);
-        expect($result->succeed)->toBeTrue();
+        expect($result->success)->toBeTrue();
         expect($result->value)->toBeTrue();
 
         $result = $schema->safeParse(0);
-        expect($result->succeed)->toBeTrue();
+        expect($result->success)->toBeTrue();
         expect($result->value)->toBeFalse();
     });
 });

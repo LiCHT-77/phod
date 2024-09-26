@@ -1,5 +1,6 @@
 <?php
 
+use Rei\Phod\PhodParseIssue;
 use Rei\Phod\Schema\StringSchema;
 use Rei\Phod\PhodParseFailedException;
 
@@ -28,15 +29,17 @@ describe('safeParse method', function () {
         $schema = new StringSchema($this->messageProvider);
         $result = $schema->safeParse('value');
 
-        expect($result->succeed)->toBeTrue();
+        expect($result->success)->toBeTrue();
     });
 
     it('should return a PaseResult object with the correct message if the value is not a string', function () {
         $schema = new StringSchema($this->messageProvider);
         $result = $schema->safeParse(new stdClass());
 
-        expect($result->succeed)->toBeFalse();
-        expect($result->message)->toBe('the value must be string');
+        expect($result->success)->toBeFalse();
+        expect($result->exception)->toBeInstanceOf(PhodParseFailedException::class);
+        expect($result->exception->issue)->toBeInstanceOf(PhodParseIssue::class);
+        expect($result->exception->issue->message)->toBe('the value must be string');
     });
 
     it('should cast the value to a string', function () {
