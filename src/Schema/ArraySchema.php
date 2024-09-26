@@ -5,7 +5,9 @@ namespace Rei\Phod\Schema;
 use Rei\Phod\PhodSchema;
 use Rei\Phod\ParseResult;
 use Rei\Phod\ParseContext;
+use Rei\Phod\PhodParseIssue;
 use Rei\Phod\Message\MessageProvider;
+use Rei\Phod\PhodParseFailedException;
 
 /**
  * @extends \Rei\Phod\PhodSchema<array>
@@ -43,7 +45,13 @@ class ArraySchema extends PhodSchema
             return new ParseResult(
                 false,
                 $value,
-                $this->messageProvider->replace($options['message'], ['key' => $context->key, 'type' => 'array']),
+                new PhodParseFailedException(
+                    new PhodParseIssue(
+                        'invalid_type',
+                        $context->path,
+                        $this->messageProvider->replace($options['message'], ['key' => $context->key, 'type' => 'array']),
+                    ),
+                ),
             );
         };
 
@@ -60,8 +68,8 @@ class ArraySchema extends PhodSchema
     {
         $this->validators[] = function(mixed $value, ParseContext $context) use ($schema) {
             foreach ($value as $key => $element) {
-                $result = $schema->safeParseWithContext($element, new ParseContext($key));
-                if (!$result->succeed) {
+                $result = $schema->safeParseWithContext($element, new ParseContext([...$context->path, $key], $key));
+                if (!$result->success) {
                     return $result;
                 }
             }

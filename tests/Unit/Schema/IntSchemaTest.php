@@ -1,5 +1,6 @@
 <?php
 
+use Rei\Phod\PhodParseIssue;
 use Rei\Phod\Schema\IntSchema;
 use Rei\Phod\PhodParseFailedException;
 
@@ -27,24 +28,26 @@ describe('safeParse method', function () {
     it('should return a PaseResult object', function () {
         $schema = new IntSchema($this->messageProvider);
         $result = $schema->safeParse(123);
-        expect($result->succeed)->toBeTrue();
+        expect($result->success)->toBeTrue();
     });
 
     it('should return a PaseResult object with the correct message if the value is not an integer', function () {
         $schema = new IntSchema($this->messageProvider);
         $result = $schema->safeParse('value');
-        expect($result->succeed)->toBeFalse();
-        expect($result->message)->toBe('the value must be integer');
+        expect($result->success)->toBeFalse();
+        expect($result->exception)->toBeInstanceOf(PhodParseFailedException::class);
+        expect($result->exception->issue)->toBeInstanceOf(PhodParseIssue::class);
+        expect($result->exception->issue->message)->toBe('the value must be integer');
     });
 
     it('should cast the value to an integer', function () {
         $schema = new IntSchema($this->messageProvider);
         $result = $schema->safeParse('123');
-        expect($result->succeed)->toBeTrue();
+        expect($result->success)->toBeTrue();
         expect($result->value)->toBe(123);
 
         $result = $schema->safeParse(2.2);
-        expect($result->succeed)->toBeFalse();
+        expect($result->success)->toBeFalse();
         expect($result->value)->toBe(2.2);
 
         $result = $schema->safeParse(null);
