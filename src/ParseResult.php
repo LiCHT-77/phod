@@ -2,6 +2,8 @@
 
 namespace Rei\Phod;
 
+use Rei\Phod\Exception\PhodParseFailedException;
+
 /**
  * @template T
  */

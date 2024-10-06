@@ -1,6 +1,8 @@
 <?php
 
-namespace Rei\Phod;
+namespace Rei\Phod\Exception;
+
+use Rei\Phod\PhodParseIssue;
 
 class PhodParseFailedException extends \Exception
 {

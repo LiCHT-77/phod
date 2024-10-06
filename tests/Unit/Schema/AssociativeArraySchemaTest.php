@@ -3,7 +3,7 @@
 use Rei\Phod\PhodParseIssue;
 use Rei\Phod\Schema\IntSchema;
 use Rei\Phod\Schema\StringSchema;
-use Rei\Phod\PhodParseFailedException;
+use Rei\Phod\Exception\PhodParseFailedException;
 use Rei\Phod\Schema\AssociativeArraySchema;
 
 describe('parse method', function () {

@@ -4,7 +4,7 @@ use Rei\Phod\ParseResult;
 use Rei\Phod\PhodParseIssue;
 use Rei\Phod\Schema\ArraySchema;
 use Rei\Phod\Schema\StringSchema;
-use Rei\Phod\PhodParseFailedException;
+use Rei\Phod\Exception\PhodParseFailedException;
 
 
 describe('parse method', function () {
