@@ -4,7 +4,7 @@ namespace Rei\Phod;
 
 use Rei\Phod\ParseResult;
 use Rei\Phod\Message\MessageProvider;
-
+use Rei\Phod\Schema\UnionSchema;
 
 /**
  * @template T
@@ -188,5 +188,16 @@ class PhodSchema
     protected function cast(mixed $value): mixed
     {
         return $value;
+    }
+
+    /**
+     * or the schema
+     *
+     * @param PhodSchema $schema
+     * @return UnionSchema
+     */
+    public function or(PhodSchema $schema): UnionSchema
+    {
+        return new UnionSchema($this->messageProvider, [$this, $schema]);
     }
 }

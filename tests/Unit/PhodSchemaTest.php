@@ -5,7 +5,7 @@ use Rei\Phod\ParseResult;
 use Rei\Phod\ParseContext;
 use Rei\Phod\PhodParseIssue;
 use Rei\Phod\Message\MessageProvider;
-use Rei\Phod\PhodParseFailedException;
+use Rei\Phod\Exception\PhodParseFailedException;
 
 beforeEach(function () {
     $this->messageProvider = new class implements MessageProvider {

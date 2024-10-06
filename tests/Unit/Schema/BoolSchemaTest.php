@@ -2,7 +2,7 @@
 
 use Rei\Phod\PhodParseIssue;
 use Rei\Phod\Schema\BoolSchema;
-use Rei\Phod\PhodParseFailedException;
+use Rei\Phod\Exception\PhodParseFailedException;
 
 describe('parse method', function () {
     it('should return the value if all validators return true', function () {

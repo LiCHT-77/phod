@@ -2,7 +2,7 @@
 
 use Rei\Phod\PhodParseIssue;
 use Rei\Phod\Schema\IntSchema;
-use Rei\Phod\PhodParseFailedException;
+use Rei\Phod\Exception\PhodParseFailedException;
 
 
 describe('parse method', function () {

@@ -8,7 +8,7 @@ use Rei\Phod\Schema\AssociativeArraySchema;
 use Rei\Phod\Schema\FloatSchema;
 use Rei\Phod\Schema\StringSchema;
 use Rei\Phod\Message\MessageProvider;
-
+use Rei\Phod\Schema\UnionSchema;
 
 class Phod
 {
@@ -73,5 +73,16 @@ class Phod
     public function array(array $data = [], array $options = []): AssociativeArraySchema
     {
         return new AssociativeArraySchema($this->messageProvider, $data, $options);
+    }
+
+    /**
+     * Make a UnionSchema.
+     *
+     * @param PhodSchema[] $schemas
+     * @return UnionSchema
+     */
+    public function union(array $schemas): UnionSchema
+    {
+        return new UnionSchema($this->messageProvider, $schemas);
     }
 }
