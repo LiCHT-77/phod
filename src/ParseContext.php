@@ -11,4 +11,17 @@ readonly class ParseContext
     {
         //
     }
+
+    /**
+     * extends the current context with a new path
+     *
+     * @param ParseContext $parent
+     * @param array $path
+     * @param string $key
+     * @return ParseContext
+     */
+    public static function extends(ParseContext $parent, array $path, string $key): ParseContext
+    {
+        return new ParseContext([...$parent->path, ...$path], $key);
+    }
 }

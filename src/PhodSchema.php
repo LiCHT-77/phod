@@ -4,7 +4,6 @@ namespace Rei\Phod;
 
 use Rei\Phod\ParseResult;
 use Rei\Phod\Message\MessageProvider;
-use Rei\Phod\PhodParseFailedException;
 
 
 /**
@@ -67,20 +66,22 @@ class PhodSchema
      */
     public function safeParse(mixed $value): ParseResult
     {
-        $context = new ParseContext([], $this->key ?? 'the value');
-
-        return $this->safeParseWithContext($value, $context);
+        return $this->safeParseWithContext($value, null);
     }
 
     /**
      * parse the value with context
      *
      * @param mixed $value
-     * @param ParseContext $context
+     * @param ParseContext|null $context
      * @return ParseResult<T>
      */
-    protected function safeParseWithContext(mixed $value, ParseContext $context): ParseResult
+    protected function safeParseWithContext(mixed $value, ?ParseContext $context): ParseResult
     {
+        $context = $context
+            ? ParseContext::extends($context, [], $this->key ?? $context->key)
+            : new ParseContext([], $this->key ?? 'the value');
+
         $value = $this->cast($value);
 
         if ($this->nullable && is_null($value)) {
