@@ -101,6 +101,19 @@ describe('safeParse method', function () {
             'age' => 30,
         ]);
     });
+
+    it('should return a ParseResult object with error if invalid value is passed', function () {
+        $schema = new AssociativeArraySchema($this->messageProvider, [
+            'name' => (new StringSchema($this->messageProvider))->key('名前'),
+        ]);
+        $result = $schema->safeParse([
+            'name' => new stdClass(),
+        ]);
+        expect($result->success)->toBeFalse();
+        expect($result->exception)->toBeInstanceOf(PhodParseFailedException::class);
+        expect($result->exception->issue)->toBeInstanceOf(PhodParseIssue::class);
+        expect($result->exception->issue->message)->toBe('名前 must be string');
+    });
 });
 
 describe('optional method', function () {
