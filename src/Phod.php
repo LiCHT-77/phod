@@ -8,6 +8,7 @@ use Rei\Phod\Schema\FloatSchema;
 use Rei\Phod\Schema\UnionSchema;
 use Rei\Phod\Schema\StringSchema;
 use Rei\Phod\Schema\LiteralSchema;
+use Rei\Phod\Schema\DateTimeSchema;
 use Rei\Phod\Message\MessageProvider;
 use Rei\Phod\Schema\AssociativeArraySchema;
 
@@ -97,5 +98,16 @@ class Phod
     public function literal(mixed $value, array $options = []): LiteralSchema
     {
         return new LiteralSchema($this->messageProvider, $value, $options);
+    }
+
+    /**
+     * Make a DateTimeSchema.
+     *
+     * @param array{invalid_type_message?: string} $options
+     * @return DateTimeSchema
+     */
+    public function dateTime(array $options = []): DateTimeSchema
+    {
+        return new DateTimeSchema($this->messageProvider, $options);
     }
 }
