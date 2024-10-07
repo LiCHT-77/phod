@@ -19,7 +19,7 @@ class ArraySchema extends PhodSchema
      *
      * @param MessageProvider $messageProvider
      * @param PhodSchema $schema
-     * @param array{invalid_type_message?: string, required_message?: string} $options
+     * @param array{invalid_type_message?: string} $options
      */
     public function __construct(MessageProvider $messageProvider, PhodSchema $schema, array $options = [])
     {

@@ -18,7 +18,7 @@ class BoolSchema extends PhodSchema
      * construct the schema
      *
      * @param MessageProvider $messageProvider
-     * @param array{invalid_type_message?: string, required_message?: string} $options
+     * @param array{invalid_type_message?: string} $options
      */
     public function __construct(
         MessageProvider $messageProvider,

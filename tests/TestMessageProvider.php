@@ -9,6 +9,7 @@ class TestMessageProvider implements MessageProvider
     const MESSAGES = [
         'invalid_type' => ':key must be :type',
         'required' => ':key is required',
+        'invalid_literal' => 'the value must be `:literal`',
     ];
 
     public function get(string $key): string
