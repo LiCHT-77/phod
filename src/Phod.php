@@ -4,11 +4,12 @@ namespace Rei\Phod;
 
 use Rei\Phod\Schema\IntSchema;
 use Rei\Phod\Schema\BoolSchema;
-use Rei\Phod\Schema\AssociativeArraySchema;
 use Rei\Phod\Schema\FloatSchema;
-use Rei\Phod\Schema\StringSchema;
-use Rei\Phod\Message\MessageProvider;
 use Rei\Phod\Schema\UnionSchema;
+use Rei\Phod\Schema\StringSchema;
+use Rei\Phod\Schema\LiteralSchema;
+use Rei\Phod\Message\MessageProvider;
+use Rei\Phod\Schema\AssociativeArraySchema;
 
 class Phod
 {
@@ -22,7 +23,7 @@ class Phod
     /**
      * Make a StringSchema.
      *
-     * @param array{invalid_type_message?: string, required_message?: string} $options
+     * @param array{invalid_type_message?: string} $options
      * @return StringSchema
      */
     public function string(array $options = []): StringSchema
@@ -33,7 +34,7 @@ class Phod
     /**
      * Make an IntSchema.
      *
-     * @param array{invalid_type_message?: string, required_message?: string} $options
+     * @param array{invalid_type_message?: string} $options
      * @return IntSchema
      */
     public function int(array $options = []): IntSchema
@@ -44,7 +45,7 @@ class Phod
     /**
      * Make a FloatSchema.
      *
-     * @param array{invalid_type_message?: string, required_message?: string} $options
+     * @param array{invalid_type_message?: string} $options
      * @return FloatSchema
      */
     public function float(array $options = []): FloatSchema
@@ -55,7 +56,7 @@ class Phod
     /**
      * Make a BoolSchema.
      *
-     * @param array{invalid_type_message?: string, required_message?: string} $options
+     * @param array{invalid_type_message?: string} $options
      * @return BoolSchema
      */
     public function bool(array $options = []): BoolSchema
@@ -84,5 +85,17 @@ class Phod
     public function union(array $schemas): UnionSchema
     {
         return new UnionSchema($this->messageProvider, $schemas);
+    }
+
+    /**
+     * Make a LiteralSchema.
+     *
+     * @param mixed $value
+     * @param array{invalid_literal_message?: string} $options
+     * @return LiteralSchema
+     */
+    public function literal(mixed $value, array $options = []): LiteralSchema
+    {
+        return new LiteralSchema($this->messageProvider, $value, $options);
     }
 }
